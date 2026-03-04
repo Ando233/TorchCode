@@ -1,16 +1,73 @@
 # TorchCode
 
-A self-hosted Jupyter-based environment for practicing PyTorch operator implementations from scratch. Like LeetCode, but for tensors — in a real notebook.
+**Crack the PyTorch interview.** Practice implementing operators and architectures from scratch — the exact skills top ML teams test for.
+
+> Like LeetCode, but for tensors. Self-hosted. Jupyter-based. Instant feedback.
+
+## Why TorchCode?
+
+Top companies (Meta, Google DeepMind, OpenAI, etc.) expect ML engineers to implement core operations **from memory on a whiteboard**. Reading papers isn't enough — you need to write `softmax`, `LayerNorm`, `MultiHeadAttention`, and full Transformer blocks cold.
+
+TorchCode gives you a **structured practice environment** with:
+
+- **13 curated problems** covering the most frequently asked PyTorch interview topics
+- **Automated judge** with correctness checks, gradient verification, and timing
+- **Instant feedback** — colored pass/fail per test case, just like competitive programming
+- **Hints when stuck** — nudges without full spoilers
+- **Reference solutions** — study optimal implementations after your attempt
+- **Progress tracking** — see what you've solved, your best times, and attempt counts
+
+No cloud. No signup. No GPU needed. Just `make run`.
 
 ## Quick Start
+
+### Option 1 — Pull the pre-built image (fastest)
+
+```bash
+docker run -p 8888:8888 ghcr.io/duoan/torchcode:latest
+```
+
+### Option 2 — Build locally
 
 ```bash
 make run
 ```
 
-Open **http://localhost:8888** — that's it.
+Open **http://localhost:8888** — that's it. Works with both Docker and Podman (auto-detected).
 
-Works with both Docker and Podman (auto-detected).
+## Problem Set
+
+### Fundamentals — "Implement X from scratch"
+
+The bread and butter of ML coding interviews. You'll be asked to write these without `torch.nn`.
+
+| # | Problem | What You'll Implement | Difficulty | Key Concepts |
+|---|---------|----------------------|------------|--------------|
+| 1 | ReLU | `relu(x)` | Easy | Activation functions, element-wise ops |
+| 2 | Softmax | `my_softmax(x, dim)` | Easy | Numerical stability, exp/log tricks |
+| 3 | Linear Layer | `SimpleLinear` (nn.Module) | Medium | `y = xW^T + b`, Kaiming init, `nn.Parameter` |
+| 4 | LayerNorm | `my_layer_norm(x, gamma, beta)` | Medium | Normalization, running stats, affine transform |
+| 7 | BatchNorm | `my_batch_norm(x, gamma, beta)` | Medium | Batch vs layer statistics, train/eval behavior |
+| 8 | RMSNorm | `rms_norm(x, weight)` | Medium | LLaMA-style norm, simpler than LayerNorm |
+
+### Attention Mechanisms — The heart of modern ML interviews
+
+If you're interviewing for any role touching LLMs or Transformers, expect at least one of these.
+
+| # | Problem | What You'll Implement | Difficulty | Key Concepts |
+|---|---------|----------------------|------------|--------------|
+| 5 | Scaled Dot-Product Attention | `scaled_dot_product_attention(Q, K, V)` | Hard | `softmax(QK^T/√d_k)V`, the foundation of everything |
+| 6 | Multi-Head Attention | `MultiHeadAttention` (nn.Module) | Hard | Parallel heads, split/concat, projection matrices |
+| 9 | Causal Self-Attention | `causal_attention(Q, K, V)` | Hard | Autoregressive masking with `-inf`, GPT-style |
+| 10 | Grouped Query Attention | `GroupQueryAttention` (nn.Module) | Hard | GQA (LLaMA 2), KV sharing across heads |
+| 11 | Sliding Window Attention | `sliding_window_attention(Q, K, V, w)` | Hard | Mistral-style local attention, O(n·w) complexity |
+| 12 | Linear Attention | `linear_attention(Q, K, V)` | Hard | Kernel trick, `φ(Q)(φ(K)^TV)`, O(n·d²) |
+
+### Full Architecture — Put it all together
+
+| # | Problem | What You'll Implement | Difficulty | Key Concepts |
+|---|---------|----------------------|------------|--------------|
+| 13 | GPT-2 Block | `GPT2Block` (nn.Module) | Hard | Pre-norm, causal MHA + MLP (4x, GELU), residual connections |
 
 ## How It Works
 
@@ -21,66 +78,44 @@ Each problem has **two** notebooks:
 | `01_relu.ipynb` | Blank template — write your code here |
 | `01_relu_solution.ipynb` | Reference solution — check when stuck |
 
-**Blank templates reset on every `make run`** so you always start fresh.
-If you want to keep your work, save it under a different filename.
-
 ### Workflow
 
-1. Open a blank notebook (e.g. `01_relu.ipynb`)
-2. Read the problem description
-3. Implement your solution in the marked cell
-4. Debug freely — `print(x.shape)`, check gradients, whatever you need
-5. Run the judge cell: `check("relu")`
-6. See instant colored feedback with per-test results
-7. Stuck? Open `01_relu_solution.ipynb` or call `hint("relu")`
-
-## Problems
-
-### Basics
-
-| # | Problem | Task ID | Difficulty |
-|---|---------|---------|------------|
-| 1 | Implement ReLU | `relu` | Easy |
-| 2 | Implement Softmax | `softmax` | Easy |
-| 3 | Simple Linear Layer | `linear` | Medium |
-| 4 | Implement LayerNorm | `layernorm` | Medium |
-| 7 | Implement BatchNorm | `batchnorm` | Medium |
-| 8 | Implement RMSNorm | `rmsnorm` | Medium |
-
-### Attention Mechanisms
-
-| # | Problem | Task ID | Difficulty |
-|---|---------|---------|------------|
-| 5 | Scaled Dot-Product Attention | `attention` | Hard |
-| 6 | Multi-Head Attention | `mha` | Hard |
-| 9 | Causal Self-Attention | `causal_attention` | Hard |
-| 10 | Grouped Query Attention | `gqa` | Hard |
-| 11 | Sliding Window Attention | `sliding_window` | Hard |
-| 12 | Linear Self-Attention | `linear_attention` | Hard |
-
-### Full Architecture
-
-| # | Problem | Task ID | Difficulty |
-|---|---------|---------|------------|
-| 13 | GPT-2 Transformer Block | `gpt2_block` | Hard |
-
-## Commands
-
-```bash
-make run    # Build & start (http://localhost:8888)
-make stop   # Stop the container
-make clean  # Stop + remove volumes + clear progress
+```
+1. Open a blank notebook           →  Read the problem description
+2. Implement your solution         →  Use only basic PyTorch ops
+3. Debug freely                    →  print(x.shape), check gradients, etc.
+4. Run the judge cell              →  check("relu")
+5. See instant colored feedback    →  ✅ pass / ❌ fail per test case
+6. Stuck? Get a nudge              →  hint("relu")
+7. Review the reference solution   →  01_relu_solution.ipynb
 ```
 
-## In-Notebook API
+### In-Notebook API
 
 ```python
 from torch_judge import check, hint, status
 
-status()                    # Progress dashboard
 check("relu")               # Judge your implementation
-hint("causal_attention")    # Get a hint
+hint("causal_attention")    # Get a hint without full spoiler
+status()                    # Progress dashboard — solved / attempted / todo
 ```
+
+## Suggested Study Plan
+
+**Week 1 — Foundations** (warm-up, 1–2 hours)
+- Day 1: ReLU, Softmax
+- Day 2: Linear Layer
+- Day 3: LayerNorm, BatchNorm, RMSNorm
+
+**Week 2 — Attention Deep Dive** (interview-critical, 3–4 hours)
+- Day 1: Scaled Dot-Product Attention
+- Day 2: Multi-Head Attention
+- Day 3: Causal Self-Attention
+- Day 4: GQA, Sliding Window, Linear Attention
+
+**Week 3 — Integration** (1–2 hours)
+- Day 1: GPT-2 Block (combines everything)
+- Day 2: Speed run — re-implement all from scratch, timed
 
 ## Architecture
 
@@ -89,29 +124,56 @@ hint("causal_attention")    # Get a hint
 │           Docker / Podman Container      │
 │                                          │
 │  JupyterLab (:8888)                     │
-│    ├── templates/  (baked in image)      │
-│    ├── solutions/  (baked in image)      │
-│    ├── torch_judge/ (judge engine)       │
+│    ├── templates/  (reset on each run)  │
+│    ├── solutions/  (reference impl)     │
+│    ├── torch_judge/ (auto-grading)      │
 │    └── PyTorch (CPU), NumPy             │
 │                                          │
-│  entrypoint.sh:                          │
-│    1. Copy templates → notebooks/ (reset)│
-│    2. Copy solutions → notebooks/        │
-│    3. Start JupyterLab (no auth)         │
-│                                          │
-│  Volumes:                                │
-│    ./notebooks    → working directory    │
-│    ./torch_judge  → judge engine (live)  │
-│    ./data         → progress.json        │
+│  Judge checks:                           │
+│    ✓ Output correctness (allclose)      │
+│    ✓ Gradient flow (autograd)           │
+│    ✓ Shape consistency                  │
+│    ✓ Edge cases & numerical stability   │
 └──────────────────────────────────────────┘
 ```
 
-Single container. Single port. No database. No frontend framework.
+Single container. Single port. No database. No frontend framework. No GPU.
 
-## Requirements
+## Commands
 
-- Docker or Podman with Compose support
-- No GPU needed — runs on CPU
+```bash
+make run    # Build & start (http://localhost:8888)
+make stop   # Stop the container
+make clean  # Stop + remove volumes + reset all progress
+```
+
+## Adding Your Own Problems
+
+TorchCode uses auto-discovery — just drop a new file in `torch_judge/tasks/`:
+
+```python
+TASK = {
+    "id": "my_task",
+    "title": "My Custom Problem",
+    "difficulty": "medium",
+    "function_name": "my_function",
+    "hint": "Think about broadcasting...",
+    "tests": [ ... ],
+}
+```
+
+No registration needed. The judge picks it up automatically.
+
+## FAQ
+
+**Q: Do I need a GPU?**
+A: No. Everything runs on CPU. The problems test correctness and understanding, not throughput.
+
+**Q: Can I keep my solutions between runs?**
+A: Blank templates reset on every `make run` so you practice from scratch. Save your work under a different filename if you want to keep it.
+
+**Q: How are solutions graded?**
+A: The judge runs your function against multiple test cases using `torch.allclose` for numerical correctness, verifies gradients flow properly via autograd, and checks edge cases specific to each operation.
 
 ## License
 
